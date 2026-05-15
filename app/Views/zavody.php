@@ -9,7 +9,9 @@ echo($this->section('content'));
 
 <div class="row">
 <?php
-/** @var array $zavody */
+/** @var array $zavody 
+ * @var object $pager
+*/
 foreach ($zavody as $row) : ?>
 <div class="col-lg-4 col-md-6 mb-4">
         <div class="card h-100">
@@ -32,6 +34,6 @@ foreach ($zavody as $row) : ?>
 <?php endforeach; ?>
 </div>
 <div class="row">
-    <?= $this->pager->links() ?>
+    <?= $pager->links() ?>
 </div>
 <?= $this->endSection(); ?>

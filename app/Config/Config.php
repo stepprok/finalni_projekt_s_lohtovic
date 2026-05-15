@@ -6,6 +6,6 @@ use CodeIgniter\Config\BaseConfig;
 
 class Config extends BaseConfig
 {
-    public $strankovani = 6;
+    public $strankovani = 9;
     
 }
