@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\RaceYear;
+use App\Models\Race;
 use CodeIgniter\HTTP\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Override;
@@ -13,7 +14,9 @@ use Config\Config;
 class ZavodyC extends BaseController
 {
     protected $raceYear;
+    protected $race;
     protected $Config;
+    public $rokZavodu;
 
     #[Override]
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
@@ -21,33 +24,45 @@ class ZavodyC extends BaseController
         parent::initController($request, $response, $logger);
 
         $this->raceYear = new RaceYear();
+
+        $this->race = new Race();
+
         $this->Config = new Config();
+        $this->rokZavodu = 0;
     }
 
     public function index($year)
     {
-        // Zjistíme z URL/GET požadavku, zda je aktivní filtr "jen moje"
         $jenMoje = $this->request->getGet('moje') === '1';
 
-        // Základ dotazu
-        $query = $this->raceYear->where('year', $year)
-            ->join('stage', 'race_year.id = stage.id_race_year');
+        $this->rokZavodu = $year;
 
-        // Pokud je zaškrtnuto "jen moje" a uživatel je přihlášený
-        if ($jenMoje && session()->has('user_id')) {
-            $query->where('race_year.vytvoril_uzivatel_id', session()->get('user_id'));
+        $builder = $this->raceYear
+            ->where('year', $year);
+
+        if ($jenMoje && session()->get('user_id')) {
+            $builder->where('vytvoril_uzivatel_id', session()->get('user_id'));
         }
 
-        $zavody = $query->paginate($this->Config->strankovani);
-
         $data = [
-            "year"    => $year,
-            "pager"   => $this->raceYear->pager,
-            "zavody"  => $zavody,
-            "jenMoje" => $jenMoje // Předáme stav filtru do View
+            'year'    => $year,
+            'zavody'  => $builder->paginate($this->Config->strankovani),
+            'pager'   => $this->raceYear->pager,
+            'jenMoje' => $jenMoje
         ];
 
-        echo view('zavody', $data);
+        return view('zavody', $data);
+    }
+
+    public function show($idZavod){
+
+        $data = [
+            'idZavod' => $idZavod,
+            'year' => $this->rokZavodu,
+            'zavod' => $this->race->where('id', $idZavod)->findAll()
+        ];
+
+        return view('race', $data);
     }
 
     public function add()
