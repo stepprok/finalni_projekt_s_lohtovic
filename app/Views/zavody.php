@@ -50,20 +50,35 @@
                         </div>
 
                         <div class="row g-0 bg-light rounded p-2 text-muted small mt-auto">
-                            <?php if ($row->start_date == $row->end_date) : ?>
-                            <div class="col-12">
-                                <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Datum</span>
-                                <span class="text-dark fw-medium"><?= date('d. m. Y', strtotime($row->start_date)) ?></span>
-                            </div> <?php else : ?>
-                            <div class="col-6 border-end">
-                                <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Od</span>
-                                <span class="text-dark fw-medium"><?= !empty($row->start_date) ? date('d. m. Y', strtotime($row->start_date)) : '' ?></span>
+                            <div class="div row"> <!-- vzelanost -->
+                                <div class="col">
+                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Délka závodu</span>
+                                    <span class="text-dark fw-medium" style="color: black; "><?= $distance ?> km</span>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Do</span>
-                                <span class="text-dark fw-medium"><?= !empty($row->end_date) ? date('d. m. Y', strtotime($row->end_date)) : '' ?></span>
-                            </div> <?php endif; ?>
-
+                            <div class="div row"> <!-- previskani -->
+                                <div class="col">
+                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Převýšení</span>
+                                    <span class="text-dark fw-medium" style="color: black; ">text</span>
+                                </div>
+                            </div>
+                            
+                            <div class="div row">
+                                <?php if ($row->start_date == $row->end_date) : ?>
+                                <div class="col-12">
+                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Datum</span>
+                                    <span class="text-dark fw-medium"><?= date('d. m. Y', strtotime($row->start_date)) ?></span>
+                                </div> <?php else : ?>
+                                <div class="col-6 border-end">
+                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Od</span>
+                                    <span class="text-dark fw-medium"><?= !empty($row->start_date) ? date('d. m. Y', strtotime($row->start_date)) : '' ?></span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Do</span>
+                                    <span class="text-dark fw-medium"><?= !empty($row->end_date) ? date('d. m. Y', strtotime($row->end_date)) : '' ?></span>
+                                </div> <?php endif; ?>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>

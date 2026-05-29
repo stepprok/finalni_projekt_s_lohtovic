@@ -47,8 +47,14 @@ class ZavodyC extends BaseController
         if ($jenMoje && session()->get('user_id')) {
             $builder->where('vytvoril_uzivatel_id', session()->get('user_id'));
         }
+        
+        $distance = $this->Stage
+        ->join('race_year', 'stage.id_race_year = race_year.id')
+        ->join('race', 'race.id = race_year.id_race')
+        ->where('race_year.year', $year)->selectSum('distance')->get()->getRow()->distance ?? 0;
 
         $data = [
+            'distance' => $distance,
             'stage'   => $stage,
             'year'    => $year,
             'zavody'  => $builder->paginate($this->Config->strankovani),
