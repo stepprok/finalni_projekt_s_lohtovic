@@ -51,50 +51,63 @@
                     </div>
 
                     <div class="card-body d-flex flex-column justify-content-between text-center">
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <span class="fi fi-<?= $row->country ?> fs-4 shadow-sm rounded-1"></span>
                         </div>
 
-                        <div class="row g-0 bg-light rounded p-2 text-muted small mt-auto">
-                            <div class="div row"> <!-- vzelanost -->
-                                <div class="col">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Délka závodu</span>
-                                    <span class="text-dark fw-medium" style="color: black; ">
-                                        <?php $stage = new \App\Models\Stage();
-                                        $distance = $stage->join('race_year', 'stage.id_race_year = race_year.id')
-                                        ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
-                                        ->where('race_year.year', $year)->selectSum('distance')->get()->getRow()->distance;?>
-                                        <?=  $distance ?> km</span>
+                        <div class="row g-0 bg-light rounded p-2 text-muted small">
+                            <div class="col">
+                                <div class="div row mb-2"> <!-- uci tour -->
+                                    <div class="col-12">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">UCI TOUR</span>
+                                        <span class="text-success-emphasis fw-medium" style="color: black; ">
+                                            <?php $race_year = new \App\Models\RaceYear();
+                                            $uci_tour_id = $race_year->where('id', $row->id)->select('uci_tour')->get()->getRow()->uci_tour;
+                                            echo $uci_moznosti[$uci_tour_id] ?? 'Nezařazeno';   
+                                         ?></span>
+                                    </div>
+                                </div>
+                                <div class="div row mb-2"> <!-- vzelanost -->
+                                    <div class="col">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Délka závodu</span>
+                                        <span class="text-success-emphasis fw-medium" style="color: black; ">
+                                            <?php $stage = new \App\Models\Stage();
+                                            $distance = $stage->join('race_year', 'stage.id_race_year = race_year.id')
+                                            ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
+                                            ->where('race_year.year', $year)->selectSum('distance')->get()->getRow()->distance; 
+                                            echo $distance; ?> km
+                                        </span>
+                                    </div>
+                                </div>
+                                <?php $stage = new \App\Models\Stage();
+                                    $elevation = $stage->join('race_year', 'stage.id_race_year = race_year.id')
+                                    ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
+                                    ->where('race_year.year', $year)->selectSum('vertical_meters', 'elevation')->get()->getRow()->elevation; 
+                                if ($elevation > 0) : ?>
+                                    <div class="div row mb-2"> <!-- previskani -->
+                                        <div class="col">
+                                            <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Převýšení</span>
+                                            <span class="text-success-emphasis fw-medium" style="color: black; ">
+                                                <?= $elevation; ?> m</span>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="div row">
+                                    <?php if ($row->start_date == $row->end_date) : ?>
+                                    <div class="col-12">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Datum</span>
+                                        <span class="text-success-emphasis fw-medium"><?= date('d. m. Y', strtotime($row->start_date)) ?></span>
+                                    </div> <?php else : ?>
+                                    <div class="col-6 border-end">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Od</span>
+                                        <span class="text-success-emphasis fw-medium"><?= !empty($row->start_date) ? date('d. m. Y', strtotime($row->start_date)) : '' ?></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Do</span>
+                                        <span class="text-success-emphasis fw-medium"><?= !empty($row->end_date) ? date('d. m. Y', strtotime($row->end_date)) : '' ?></span>
+                                    </div> <?php endif; ?>
                                 </div>
                             </div>
-                            <div class="div row"> <!-- previskani -->
-                                <div class="col">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Převýšení</span>
-                                    <span class="text-dark fw-medium" style="color: black; ">
-                                        <?php $stage = new \App\Models\Stage();
-                                        $elevation = $stage->join('race_year', 'stage.id_race_year = race_year.id')
-                                        ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
-                                        ->where('race_year.year', $year)->selectSum('vertical_meters', 'elevation')->get()->getRow()->elevation;?>
-                                        <?=  $elevation ?> m</span>
-                                </div>
-                            </div>
-                            
-                            <div class="div row">
-                                <?php if ($row->start_date == $row->end_date) : ?>
-                                <div class="col-12">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Datum</span>
-                                    <span class="text-dark fw-medium"><?= date('d. m. Y', strtotime($row->start_date)) ?></span>
-                                </div> <?php else : ?>
-                                <div class="col-6 border-end">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Od</span>
-                                    <span class="text-dark fw-medium"><?= !empty($row->start_date) ? date('d. m. Y', strtotime($row->start_date)) : '' ?></span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black; ">Do</span>
-                                    <span class="text-dark fw-medium"><?= !empty($row->end_date) ? date('d. m. Y', strtotime($row->end_date)) : '' ?></span>
-                                </div> <?php endif; ?>
-                            </div>
-                            
                         </div>
                     </div>
                 </div>
