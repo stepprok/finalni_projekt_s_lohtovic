@@ -86,24 +86,31 @@ class ZavodyC extends BaseController
     {
         if ($this->request->is('post')) {
 
+            // 1. Rozšířená validační pravidla o nová pole
             $rules = [
-                'nazev'       => 'required|min_length[3]|max_length[255]',
-                'rok'         => 'required|numeric',
-                'id_uci_tour' => 'required|numeric',
-                'logo'        => 'uploaded[logo]|max_size[logo,2048]|ext_in[logo,jpg,jpeg,png]',
+                'nazev'           => 'required|min_length[3]|max_length[255]',
+                'rok'             => 'required|numeric',
+                'id_uci_tour'     => 'required|numeric',
+                'total_distance'  => 'required|numeric',
+                'total_elevation' => 'required|numeric',
+                'logo'            => 'uploaded[logo]|max_size[logo,2048]|ext_in[logo,jpg,jpeg,png]',
+                'bio'             => 'permit_empty', // Vyčištěné HTML z WYSIWYG projde sem
             ];
 
             if (! $this->validate($rules)) {
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
             }
 
+            // 2. Mapování nových dat z formuláře do DB polí
             $insertData = [
                 'real_name'            => $this->request->getPost('nazev'),
                 'year'                 => $this->request->getPost('rok'),
-                'id_uci_tour'          => $this->request->getPost('id_uci_tour'),
-                'id_rocniku'           => $this->request->getPost('id_rocniku'),
+                'uci_tour'             => $this->request->getPost('id_uci_tour'),
+                'total_distance'       => $this->request->getPost('total_distance'),
+                'total_elevation'      => $this->request->getPost('total_elevation'),
+                'bio'                  => $this->request->getPost('description'),
                 'logo'                 => '',
-                'vytvoril_uzivatel_id' => 1, // Automaticky dáváme 1 (vytvořeno uživatelem)
+                'vytvoril_uzivatel_id' => 1,
             ];
 
             if ($this->raceYear->insert($insertData)) {
@@ -121,7 +128,9 @@ class ZavodyC extends BaseController
                 }
 
                 $rok = $this->request->getPost('rok');
-                return redirect()->to(base_url("index.php/zavody/{$rok}"))->with('success', 'Závod byl úspěšně přidán.');
+
+                // Opraveno přesměrování na route /roky/XYZ dle tvého nastavení routes
+                return redirect()->to(base_url("index.php/roky/{$rok}"))->with('success', 'Závod byl úspěšně přidán.');
             } else {
                 return redirect()->back()->withInput()->with('error', 'Nepodařilo se uložit závod.');
             }

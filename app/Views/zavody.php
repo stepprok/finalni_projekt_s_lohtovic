@@ -52,7 +52,7 @@
                 <div class="card h-100 shadow-sm border-0">
                     <div class="card-header d-flex flex-column justify-content-center align-items-center border-bottom-0 py-3" style="height: 140px;">
                         <h5 class="text-center mb-2 fw-bold">
-                            <?= anchor('roky/zavod/' . $row->id, $row->real_name, ['class' => 'text-decoration-none text-dark hover-primary']) ?>
+                            <?= anchor('index.php/race/show/' . $row->id, $row->real_name, ['class' => 'text-decoration-none text-dark hover-primary']) ?>
                         </h5>
 
                         <div class="d-flex align-items-center justify-content-center" style="height: 50px;">
@@ -74,9 +74,9 @@
                                     <span class="text-dark fw-medium" style="color: black; ">
                                         <?php $stage = new \App\Models\Stage();
                                         $distance = $stage->join('race_year', 'stage.id_race_year = race_year.id')
-                                        ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
-                                        ->where('race_year.year', $year)->selectSum('distance')->get()->getRow()->distance;?>
-                                        <?=  $distance ?> km</span>
+                                            ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
+                                            ->where('race_year.year', $year)->selectSum('distance')->get()->getRow()->distance; ?>
+                                        <?= $distance ?> km</span>
                                 </div>
                             </div>
                             <div class="div row"> <!-- previskani -->
@@ -85,28 +85,28 @@
                                     <span class="text-dark fw-medium" style="color: black; ">
                                         <?php $stage = new \App\Models\Stage();
                                         $elevation = $stage->join('race_year', 'stage.id_race_year = race_year.id')
-                                        ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
-                                        ->where('race_year.year', $year)->selectSum('vertical_meters', 'elevation')->get()->getRow()->elevation;?>
-                                        <?=  $elevation ?> m</span>
+                                            ->join('race', 'race.id = race_year.id_race')->where('race_year.id', $row->id)
+                                            ->where('race_year.year', $year)->selectSum('vertical_meters', 'elevation')->get()->getRow()->elevation; ?>
+                                        <?= $elevation ?> m</span>
                                 </div>
                             </div>
-                            
+
                             <div class="div row">
                                 <?php if ($row->start_date == $row->end_date) : ?>
-                                <div class="col-12">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black;">Datum</span>
-                                    <span class="text-dark fw-medium"><?= date('d. m. Y', strtotime($row->start_date)) ?></span>
-                                </div> <?php else : ?>
-                                <div class="col-6 border-end">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black;">Od</span>
-                                    <span class="text-dark fw-medium"><?= !empty($row->start_date) ? date('d. m. Y', strtotime($row->start_date)) : '' ?></span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="d-block text-uppercase text-xs fw-semibold" style="color: black;">Do</span>
-                                    <span class="text-dark fw-medium"><?= !empty($row->end_date) ? date('d. m. Y', strtotime($row->end_date)) : '' ?></span>
-                                </div> <?php endif; ?>
+                                    <div class="col-12">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black;">Datum</span>
+                                        <span class="text-dark fw-medium"><?= date('d. m. Y', strtotime($row->start_date)) ?></span>
+                                    </div> <?php else : ?>
+                                    <div class="col-6 border-end">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black;">Od</span>
+                                        <span class="text-dark fw-medium"><?= !empty($row->start_date) ? date('d. m. Y', strtotime($row->start_date)) : '' ?></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="d-block text-uppercase text-xs fw-semibold" style="color: black;">Do</span>
+                                        <span class="text-dark fw-medium"><?= !empty($row->end_date) ? date('d. m. Y', strtotime($row->end_date)) : '' ?></span>
+                                    </div> <?php endif; ?>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -149,6 +149,21 @@
                             <?php echo form_input_bs('nazev', ['id' => 'nazev_add', 'value' => ''], 'Název závodu:', 'text', true); ?>
                             <input type="hidden" name="id_rocniku" id="id_rocniku_add" value="">
 
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" step="0.1" name="total_distance" id="distance_add" class="form-control" placeholder="Délka (km)" required>
+                                        <label for="distance_add">Celková délka (km):</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="number" name="total_elevation" id="elevation_add" class="form-control" placeholder="Převýšení (m)" required>
+                                        <label for="elevation_add">Celkové převýšení (m):</label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-floating mb-3">
                                 <select name="rok" id="rok_add" class="form-select">
                                     <?php for ($i = 2015; $i <= date('Y') + 2; $i++): ?>
@@ -171,6 +186,11 @@
                                 <input type="file" name="logo" id="logo_add" class="form-control" placeholder="Logo závodu" required>
                                 <label for="logo_add">Logo závodu:</label>
                                 <small class="text-muted d-block mt-1">Povolené formáty: jpg, png (max 2MB)</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bio_add" class="form-label fw-semibold text-xs text-uppercase">Informace o závodu (Bio):</label>
+                                <textarea name="bio" id="bio_add" class="form-control summernote"></textarea>
                             </div>
 
                             <div class="modal-footer px-0 pb-0 mt-3">
@@ -262,6 +282,36 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+    
+    // Najdeme naše modální okno s formulářem
+    const pridatModal = document.getElementById('pridat');
+    
+    if (pridatModal) {
+        // Jakmile se modál plně zobrazí, aktivujeme editor
+        pridatModal.addEventListener('shown.bs.modal', function () {
+            $('.summernote').summernote({
+                placeholder: 'Zde napište podrobnosti o závodu...',
+                tabsize: 2,
+                height: 200,
+                lang: 'cs-CZ', // pokud chceš češtinu (vyžadovalo by další script, raději necháme default)
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'clear']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['view', ['codeview']]
+                ]
+            });
+        });
+
+        // Jakmile se modál zavře, editor zničíme, aby se při příštím otevření nezasekl
+        pridatModal.addEventListener('hidden.bs.modal', function () {
+            $('.summernote').summernote('destroy');
+        });
+    }
+
+});
 
         // --- NAŠEPTÁVAČ PRO EDITACI ---
         const searchInput = document.getElementById('zavod_search_input');
@@ -384,5 +434,9 @@
             });
         }
     });
+
+    <
+    script src = "<?= base_url('node_modules/tinymce/tinymce.min.js'); ?>"
+    referrerpolicy = "origin" >
 </script>
 <?= $this->endSection() ?>
