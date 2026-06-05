@@ -1,8 +1,6 @@
 <?= $this->extend('Layout/template') ?>
 <?= $this->section('content') ?>
-
 <br>
-
 <?php
 /**
  * @var object $zavod
@@ -22,7 +20,6 @@
     <i class="fa-solid fa-caret-left"></i> Zpět
   </a>
 </div>
-
 <div class="card mb-4">
   <div class="card-header">
     Rok: <?= $year ?> (<?= $zavod->real_name ?>)
@@ -39,7 +36,7 @@
     <span class="d-block text-xs mb-1"><strong>Vzdálenost:</strong> <?= $zavod->total_distance ?? 0 ?> km</span>
     <span class="d-block text-xs mb-1"><strong>Převýšení:</strong> <?= $zavod->total_elevation ?? 0 ?> m</span>
   </div>
-
+  
   <?php if (!empty($zavod->logo)): ?>
     <div class="card-footer">
       <strong>Logo</strong>
@@ -49,5 +46,4 @@
     </div>
   <?php endif; ?>
 </div>
-
 <?= $this->endSection() ?>
