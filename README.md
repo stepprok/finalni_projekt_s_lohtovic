@@ -39,7 +39,7 @@ Webová aplikace pro správu a zobrazování cyklistických závodů v jednotliv
 ### Frontend
 - Bootstrap 5
 - Font Awesome
-- Summernote
+- TinyMCE
 - Tom Select
 - JavaScript
 
@@ -157,7 +157,7 @@ Projekt obsahuje:
 
 ## Vysvětlení JavaScriptu v zavod.php
 
-### Inicializace Summernote editoru
+### Inicializace TinyMCE editoru
 
 ```javascript
 document.addEventListener("DOMContentLoaded", function() {
@@ -179,33 +179,45 @@ Najde modální okno určené pro přidávání nového závodu.
 pridatModal.addEventListener('shown.bs.modal', function () {
 ```
 
-Po otevření modálního okna se spustí editor Summernote.
+Po otevření modálního okna se inicializuje editor TinyMCE.
 
 ---
 
 ```javascript
-$('.summernote').summernote({
+tinymce.init({
+    selector: '#bio_add',
+    height: 300
+});
 ```
 
-Vytvoří textový editor umožňující:
+Vytvoří WYSIWYG editor umožňující:
 
+- formátování textu
 - tučné písmo
+- kurzívu
 - podtržení
 - seznamy
 - tabulky
-- editaci HTML
+- vkládání odkazů
+- editaci HTML kódu
 
-Editor slouží pro zadávání informací o závodu.
+Editor slouží pro zadávání podrobných informací o závodu.
 
 ---
 
 ```javascript
 pridatModal.addEventListener('hidden.bs.modal', function () {
-    $('.summernote').summernote('destroy');
+    const editor = tinymce.get('bio_add');
+
+    if (editor) {
+        editor.remove();
+    }
 });
 ```
 
-Po zavření okna se editor odstraní z paměti, aby se při dalším otevření nevytvářel znovu přes již existující instanci.
+Po zavření modálního okna se editor odstraní z paměti, aby při dalším otevření nevznikaly duplicitní instance editoru.
+
+Výhodou tohoto řešení je nižší spotřeba paměti a správná funkčnost editoru i při opakovaném otevírání modálního okna.
 
 ---
 
@@ -377,7 +389,7 @@ Obnoví stránku s novým filtrem.
 
 JavaScript v souboru `zavod.php` zajišťuje:
 
-- inicializaci textového editoru Summernote,
+- inicializaci textového editoru TinyMCE,
 - dynamické otevírání a zavírání modálních oken,
 - vyhledávání závodů pomocí našeptávače,
 - automatické vyplňování formulářů,
