@@ -294,8 +294,17 @@
 <script src="<?= base_url('node_modules/tinymce/tinymce.min.js') ?>" referrerpolicy="origin"></script>
 
 <script>
-    < script src = "<?= base_url('node_modules/tom-select/dist/js/tom-select.base.js') ?>" >
+    tinymce.init({
+        selector: '#bio_add', // Cílové ID tvé textarey v modalovém okně
+        height: 250,
+        menubar: false,
+        plugins: 'lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
+        toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+        language: 'cs' // Volitelné: pokud máš staženou češtinu v tinymce/langs/cs.js
+    });
 </script>
+
+<script src="<?= base_url('node_modules/tom-select/dist/js/tom-select.base.js') ?>"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -306,6 +315,13 @@
         const hiddenIdInput = document.getElementById('zavod_id_hidden');
         const editWrapper = document.getElementById('edit_fields_wrapper');
         const editNazevField = document.getElementById('nazev_edit');
+
+        // Oprava focusu pro TinyMCE uvnitř Bootstrap modalu
+        document.addEventListener('focusin', function(e) {
+            if (e.target.closest(".tox-tinymce, .tox-tinymce-aux, .moxman-window, .tox-dialog") !== null) {
+                e.stopImmediatePropagation();
+            }
+        });
 
         if (searchInput) {
             searchInput.addEventListener('input', function() {
@@ -405,6 +421,32 @@
                 bootstrap.Modal.getInstance(document.getElementById('pridat')).hide();
                 new bootstrap.Modal(document.getElementById(modalId)).show();
             });
+
+            // --- INICIALIZACE TINYMCE PO OTEVŘENÍ MODALU ---
+            const pridatModal = document.getElementById('pridat');
+
+            if (pridatModal) {
+                pridatModal.addEventListener('shown.bs.modal', function() {
+                    // Inicializujeme TinyMCE až když je modal viditelný
+                    if (!tinymce.get('bio_add')) {
+                        tinymce.init({
+                            selector: '#bio_add',
+                            height: 250,
+                            menubar: false,
+                            plugins: 'lists link image charmap preview anchor searchreplace visualblocks code fullscreen table wordcount',
+                            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat',
+                            language: 'cs'
+                        });
+                    }
+                });
+
+                // Ošetření focusu pro Bootstrap Modal (aby fungovaly klikátka v TinyMCE)
+                document.addEventListener('focusin', function(e) {
+                    if (e.target.closest(".tox-tinymce, .tox-tinymce-aux, .moxman-window, .tox-dialog") !== null) {
+                        e.stopImmediatePropagation();
+                    }
+                });
+            }
         }
 
         // --- FILTER "MOJE" ---

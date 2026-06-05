@@ -86,7 +86,7 @@ class ZavodyC extends BaseController
     {
         if ($this->request->is('post')) {
 
-            // 1. Rozšířená validační pravidla o nová pole
+            // 1. Validace
             $rules = [
                 'nazev'           => 'required|min_length[3]|max_length[255]',
                 'rok'             => 'required|numeric',
@@ -94,43 +94,59 @@ class ZavodyC extends BaseController
                 'total_distance'  => 'required|numeric',
                 'total_elevation' => 'required|numeric',
                 'logo'            => 'uploaded[logo]|max_size[logo,2048]|ext_in[logo,jpg,jpeg,png]',
-                'bio'             => 'permit_empty', // Vyčištěné HTML z WYSIWYG projde sem
+                'bio'             => 'permit_empty',
             ];
 
             if (! $this->validate($rules)) {
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
             }
 
-            // 2. Mapování nových dat z formuláře do DB polí
+            // Dnešní datum jako výchozí pro start i konec, aby v DB nebylo prázdno
+            $today = date('Y-m-d');
+
+            // 2. Příprava dat pro tabulku ROČNÍKU ZÁVODU (race_year)
             $insertData = [
                 'real_name'            => $this->request->getPost('nazev'),
                 'year'                 => $this->request->getPost('rok'),
                 'uci_tour'             => $this->request->getPost('id_uci_tour'),
-                'total_distance'       => $this->request->getPost('total_distance'),
-                'total_elevation'      => $this->request->getPost('total_elevation'),
-                'bio'                  => $this->request->getPost('description'),
+                'bio'                  => $this->request->getPost('bio'),
+                'start_date'           => $today, // OPRAVA: Nastavíme datum
+                'end_date'             => $today,   // OPRAVA: Nastavíme datum
                 'logo'                 => '',
                 'vytvoril_uzivatel_id' => 1,
             ];
 
-            if ($this->raceYear->insert($insertData)) {
-                $newId = $this->raceYear->getInsertID();
-                $img = $this->request->getFile('logo');
+            // Zpracování loga
+            $img = $this->request->getFile('logo');
+            if ($img && $img->isValid() && ! $img->hasMoved()) {
+                $extension = $img->getClientExtension();
+                $logoName = 'logo-' . time() . '-' . rand(1000, 9999) . '.' . $extension;
+                $uploadPath = FCPATH . 'img/logos/';
 
-                if ($img && $img->isValid() && ! $img->hasMoved()) {
-                    $extension = $img->getClientExtension();
-                    $logoName = 'logo-' . $newId . '.' . $extension;
-                    $uploadPath = FCPATH . 'img/logos/';
-
-                    if ($img->move($uploadPath, $logoName)) {
-                        $this->raceYear->update($newId, ['logo' => $logoName]);
-                    }
+                if ($img->move($uploadPath, $logoName)) {
+                    $insertData['logo'] = $logoName;
                 }
+            }
+
+            // 3. Vložení ročníku do DB
+            if ($this->raceYear->insert($insertData)) {
+                $newRaceYearId = $this->raceYear->getInsertID();
+
+                // 4. OPRAVA KILOMETRŮ A PŘEVÝŠENÍ:
+                // Protože tvůj web sčítá kilometry z etap, musíme zadané hodnoty uložit jako první etapu.
+                $stageData = [
+                    'id_race_year'    => $newRaceYearId,
+                    'distance'        => $this->request->getPost('total_distance'),
+                    'vertical_meters' => $this->request->getPost('total_elevation'),
+                    // Pokud má tabulka stage další povinná pole (např. nazev_etapy), přidej je sem:
+                    // 'name' => '1. etapa', 
+                ];
+
+                $this->Stage->insert($stageData);
+
 
                 $rok = $this->request->getPost('rok');
-
-                // Opraveno přesměrování na route /roky/XYZ dle tvého nastavení routes
-                return redirect()->to(base_url("index.php/roky/{$rok}"))->with('success', 'Závod byl úspěšně přidán.');
+                return redirect()->to(base_url("index.php/roky/{$rok}"))->with('success', 'Závod byl úspěšně přidán včetně etapy.');
             } else {
                 return redirect()->back()->withInput()->with('error', 'Nepodařilo se uložit závod.');
             }
