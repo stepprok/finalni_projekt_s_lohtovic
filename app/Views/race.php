@@ -29,30 +29,15 @@
   </div>
 
   <div class="card-body">
-    <p><strong>Vzdálenost:</strong> <?= $zavod->total_distance ?? 0 ?> km</p>
-    <p><strong>Převýšení:</strong> <?= $zavod->total_elevation ?? 0 ?> m</p>
-
     <?php if ($zavod->start_date == $zavod->end_date) : ?>
-      <div class="col-12 mb-2">
-        <span class="d-block text-uppercase text-xs fw-semibold">Datum: <?= !empty($zavod->start_date) ? date('d. m. Y', strtotime($zavod->start_date)) : '-' ?></span>
-        
-      </div>
+      <span class="d-block text-xs mb-1"><strong>Datum:</strong> <?= !empty($zavod->start_date) ? date('d. m. Y', strtotime($zavod->start_date)) : '-' ?></span>
     <?php else : ?>
-      <div class="row">
-        <div class="col-6 border-end">
-          <span class="d-block text-uppercase text-xs fw-semibold">Od</span>
-          <span class="fw-medium">
-            <?= !empty($zavod->start_date) ? date('d. m. Y', strtotime($zavod->start_date)) : '-' ?>
-          </span>
-        </div>
-        <div class="col-6">
-          <span class="d-block text-uppercase text-xs fw-semibold">Do</span>
-          <span class="fw-medium">
-            <?= !empty($zavod->end_date) ? date('d. m. Y', strtotime($zavod->end_date)) : '-' ?>
-          </span>
-        </div>
-      </div>
+      <span class="d-block text-xs mb-1"><strong>Datum:</strong> <?= !empty($zavod->start_date) ? date('d. m. Y', strtotime($zavod->start_date)) : '-' ?> - 
+      <?= !empty($zavod->end_date) ? date('d. m. Y', strtotime($zavod->end_date)) : '-' ?>
+      </span>
     <?php endif; ?>
+    <span class="d-block text-xs mb-1"><strong>Vzdálenost:</strong> <?= $zavod->total_distance ?? 0 ?> km</span>
+    <span class="d-block text-xs mb-1"><strong>Převýšení:</strong> <?= $zavod->total_elevation ?? 0 ?> m</span>
   </div>
 
   <?php if (!empty($zavod->logo)): ?>
