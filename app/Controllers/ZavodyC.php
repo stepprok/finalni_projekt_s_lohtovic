@@ -215,22 +215,23 @@ class ZavodyC extends BaseController
             return redirect()->back()->with('error', 'Neoprávněný přístup.');
         }
 
+        // Nyní už ID korektně přijde ze skrytého inputu v POSTu
         $id = $this->request->getPost('id');
 
         if (empty($id)) {
             return redirect()->back()->with('error', 'Nebylo zadáno ID závodu ke smazání.');
         }
 
-        // POZOR: Tady máš model 'ZavodModel', ujisti se, že pod tímto názvem je v DB soft-delete, 
-        // jinak použij přímo $this->raceYear->delete($id);
-        $zavodyModel = model('ZavodModel');
-        $zavod = $zavodyModel->find($id);
+        // Sjednoceno na model, který používáš v celém controlleru
+        $zavod = $this->raceYear->find($id);
 
         if (!$zavod) {
             return redirect()->back()->with('error', 'Závod nebyl nalezen.');
         }
 
-        if ($zavodyModel->delete($id)) {
+        // Pokud má model RaceYear nastaveno $useSoftDeletes = true, 
+        // toto provede soft-delete (zapíše timestamp do deleted_at v DB)
+        if ($this->raceYear->delete($id)) {
             return redirect()->back()->with('success', 'Závod byl úspěšně skryt z přehledu.');
         } else {
             return redirect()->back()->with('error', 'Závod se nepodařilo odstranit.');

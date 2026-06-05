@@ -10,4 +10,4 @@ $routes->get('/roky/(:num)', 'ZavodyC::index/$1');
 $routes->get('/race/show/(:num)', 'RaceC::show/$1');
 $routes->post('zavody/pridat', 'ZavodyC::add');
 $routes->post('zavody/change', 'ZavodyC::change');
-$routes->post('zavody/smazat', 'ZavodyC::delete');
+$routes->post('zavodyc/delete', 'ZavodyC::delete');
