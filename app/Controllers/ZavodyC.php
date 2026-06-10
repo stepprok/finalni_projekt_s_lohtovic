@@ -161,7 +161,7 @@ class ZavodyC extends BaseController
             return redirect()->back()->with('error', 'Neoprávněný přístup.');
         }
 
-        $id = $this->request->getPost('zavod_id');
+        $id = $this->request->getPost('id');
 
         if (empty($id)) {
             return redirect()->back()->with('error', 'Nebyl vybrán žádný závod k úpravě.');
@@ -215,22 +215,14 @@ class ZavodyC extends BaseController
             return redirect()->back()->with('error', 'Neoprávněný přístup.');
         }
 
+        // OPRAVA: Změněno z 'id' na 'zavod_id'
         $id = $this->request->getPost('id');
 
         if (empty($id)) {
             return redirect()->back()->with('error', 'Nebylo zadáno ID závodu ke smazání.');
         }
 
-        // POZOR: Tady máš model 'ZavodModel', ujisti se, že pod tímto názvem je v DB soft-delete, 
-        // jinak použij přímo $this->raceYear->delete($id);
-        $zavodyModel = model('ZavodModel');
-        $zavod = $zavodyModel->find($id);
-
-        if (!$zavod) {
-            return redirect()->back()->with('error', 'Závod nebyl nalezen.');
-        }
-
-        if ($zavodyModel->delete($id)) {
+        if ($this->raceYear->delete($id)) {
             return redirect()->back()->with('success', 'Závod byl úspěšně skryt z přehledu.');
         } else {
             return redirect()->back()->with('error', 'Závod se nepodařilo odstranit.');
