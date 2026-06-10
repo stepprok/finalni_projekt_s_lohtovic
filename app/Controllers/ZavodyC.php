@@ -161,7 +161,7 @@ class ZavodyC extends BaseController
             return redirect()->back()->with('error', 'Neoprávněný přístup.');
         }
 
-        $id = $this->request->getPost('zavod_id');
+        $id = $this->request->getPost('id');
 
         if (empty($id)) {
             return redirect()->back()->with('error', 'Nebyl vybrán žádný závod k úpravě.');
@@ -215,22 +215,13 @@ class ZavodyC extends BaseController
             return redirect()->back()->with('error', 'Neoprávněný přístup.');
         }
 
-        // Nyní už ID korektně přijde ze skrytého inputu v POSTu
+        // OPRAVA: Změněno z 'id' na 'zavod_id'
         $id = $this->request->getPost('id');
 
         if (empty($id)) {
             return redirect()->back()->with('error', 'Nebylo zadáno ID závodu ke smazání.');
         }
 
-        // Sjednoceno na model, který používáš v celém controlleru
-        $zavod = $this->raceYear->find($id);
-
-        if (!$zavod) {
-            return redirect()->back()->with('error', 'Závod nebyl nalezen.');
-        }
-
-        // Pokud má model RaceYear nastaveno $useSoftDeletes = true, 
-        // toto provede soft-delete (zapíše timestamp do deleted_at v DB)
         if ($this->raceYear->delete($id)) {
             return redirect()->back()->with('success', 'Závod byl úspěšně skryt z přehledu.');
         } else {
